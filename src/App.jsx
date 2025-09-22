@@ -146,13 +146,13 @@ const App = () => {
         path="/Login"
         element={
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-            <Login onSubmit={handleAuthSubmit} onSwitchMode={() => navigate('/signup')} />
+            <Login onSubmit={handleAuthSubmit} onSwitchMode={() => navigate('/Signup')} />
           </div>} />
  <Route
         path="/SignUp"
         element={
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-            <SignUp onSubmit={handleAuthSubmit} onSwitchMode={() => navigate('/login')} />
+            <SignUp onSubmit={handleAuthSubmit} onSwitchMode={() => navigate('/Login')} />
           </div>} />
 
 
@@ -160,14 +160,14 @@ const App = () => {
         element={
           currentUser
             ? <ProtectedLayout />
-            : <Navigate to="/login" replace />
+            : <Navigate to="/Login" replace />
         }>
           <Route path ='/' element={<Dashboard/>} />
           <Route path='/pending' element={<PendingPage/>}/>
           <Route path='/complete' element={<CompletePage/>}/>
           <Route path='/profile' element={<Profile user={currentUser} setCurrentUser={setCurrentUser} onLogout={handleLogout}/>}/>
           </Route>
-          <Route path='*' element={<Navigate to={currentUser ? '/' : '/login'} replace/>}/>
+          <Route path='*' element={<Navigate to={currentUser ? '/' : '/Login'} replace/>}/>
           </Routes>
 
   );
