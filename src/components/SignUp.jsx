@@ -1,4 +1,43 @@
-// SignUp.jsx
+
+// SignUp.jsx (add at the top) 
+// google sign up ka button
+// -------------------------------------------------
+
+import { auth, googleProvider } from "../firebase"
+import { signInWithPopup } from "firebase/auth"
+import { FcGoogle } from "react-icons/fc"
+
+// inside SignUp component
+const handleGoogleSignUp = async () => {
+  try {
+    const result = await signInWithPopup(auth, googleProvider);
+    const user = result.user;
+    const token = await user.getIdToken();
+
+    localStorage.setItem("token", token);
+    localStorage.setItem("userId", user.uid);
+
+    onSubmit?.({
+      token,
+      userId: user.uid,
+      email: user.email,
+      name: user.displayName,
+      avatar: user.photoURL,
+    });
+
+    setMessage({
+      text: "Signed up with Google! Redirecting...",
+      type: "success",
+    });
+  } catch (error) {
+    setMessage({ text: error.message, type: "error" });
+  }
+};
+
+
+// --------------------------------------------------
+
+// / SignUp.jsx taskflow ka 
 import { UserPlus, Mail, Lock, User } from "lucide-react"
 import React, { useState } from "react"
 import axios from "axios"
@@ -123,6 +162,27 @@ const SignUp = ({ onSwitchMode, onSubmit }) => {
           )}
         </button>
       </form>
+
+ {/* ---------------------------------------------- */}
+
+
+{/* 👉 Google SignUp Button */}
+<div className="mt-4">
+  <button
+    onClick={handleGoogleSignUp}
+    type="button"
+    className="w-full border border-gray-300 rounded-lg py-2 px-4 flex items-center justify-center gap-2 hover:bg-gray-100 transition"
+  >
+    <FcGoogle className="w-5 h-5" />
+    <span className="text-sm font-medium text-gray-700">
+      Sign Up with Google
+    </span>
+  </button>
+</div>
+
+
+ {/* ---------------------------------------------------------- */}
+
 
       <p className="text-center text-sm text-gray-600 mt-6">
         Already have an account?{" "}

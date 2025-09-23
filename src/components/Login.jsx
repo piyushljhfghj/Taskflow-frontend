@@ -1,4 +1,42 @@
-// Login.jsx
+
+// yeh hai google authentication ka code/
+
+// Login.jsx (add at the top)
+import { auth, googleProvider } from "../firebase"
+import { signInWithPopup } from "firebase/auth"
+import { FcGoogle } from "react-icons/fc"
+
+// inside Login component
+const handleGoogleLogin = async () => {
+  try {
+    const result = await signInWithPopup(auth, googleProvider);
+    const user = result.user;
+
+    // ✅ Save token + user in localStorage
+    const token = await user.getIdToken();
+    localStorage.setItem("token", token);
+    localStorage.setItem("userId", user.uid);
+
+    onSubmit?.({
+      token,
+      userId: user.uid,
+      email: user.email,
+      name: user.displayName,
+      avatar: user.photoURL,
+    });
+
+    toast.success("Logged in with Google! Redirecting...");
+    navigate("/");
+  } catch (error) {
+    toast.error(error.message);
+  }
+};
+
+
+// --------------------------------------------------------
+
+
+// Login.jsx yeh hai task flow ka code 
 import { useState, useEffect } from "react"
 import axios from "axios"
 import { Mail, Lock, Eye, EyeOff, LogIn } from "lucide-react"
@@ -153,6 +191,27 @@ const Login = ({ onSubmit, onSwitchMode }) => {
           )}
         </button>
       </form>
+
+
+{/* ---------------------------------------------- */}
+    
+    
+      {/* 👉 Google Login Button */}
+
+<div className="mt-4">
+  <button
+    onClick={handleGoogleLogin}
+    type="button"
+    className="w-full border border-gray-300 rounded-lg py-2 px-4 flex items-center justify-center gap-2 hover:bg-gray-100 transition"
+  >
+    <FcGoogle className="w-5 h-5" />
+    <span className="text-sm font-medium text-gray-700">
+      Continue with Google
+    </span>
+  </button>
+</div>
+
+{/* ------------------------------------------------- */}
 
       <p className="text-center text-sm text-gray-600 mt-6">
         Don't have an account?{" "}
