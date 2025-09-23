@@ -7,7 +7,7 @@ import { getAnalytics } from "firebase/analytics";
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "AIzaSyCIUb38ebiQ9UtgV2b8zlvuUKx_SBmJpcc",
+  apiKey: import.meta.env.VIET_FIREBASE_APIKEY,
   authDomain: "taskflow-ba113.firebaseapp.com",
   projectId: "taskflow-ba113",
   storageBucket: "taskflow-ba113.firebasestorage.app",
