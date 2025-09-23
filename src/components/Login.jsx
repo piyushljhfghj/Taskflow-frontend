@@ -10,20 +10,19 @@ import { FcGoogle } from "react-icons/fc"
 const handleGoogleLogin = async () => {
   try {
     const result = await signInWithPopup(auth, googleProvider);
-    const user = result.user;
+    const firebaseUser = result.user;
+    const firebaseToken = await firebaseUser.getIdToken();
 
-    // ✅ Save token + user in localStorage
-    const token = await user.getIdToken();
-    localStorage.setItem("token", token);
-    localStorage.setItem("userId", user.uid);
+    // 🔑 Send Firebase token to backend
+    const { data } = await axios.post(`${url}/api/auth/google`, { token: firebaseToken });
 
-    onSubmit?.({
-      token,
-      userId: user.uid,
-      email: user.email,
-      name: user.displayName,
-      avatar: user.photoURL,
-    });
+    if (!data.success) throw new Error("Google login failed");
+
+    // ✅ Store backend JWT + user
+    localStorage.setItem("token", data.token);
+    localStorage.setItem("userId", data.user._id);
+
+    onSubmit?.({ token: data.token, userId: data.user._id, ...data.user });
 
     toast.success("Logged in with Google! Redirecting...");
     navigate("/");
@@ -31,7 +30,6 @@ const handleGoogleLogin = async () => {
     toast.error(error.message);
   }
 };
-
 
 // --------------------------------------------------------
 
