@@ -88,50 +88,37 @@
 
 // export default App;
 
-
-
-import React, { useState, useEffect } from 'react';
-import { Routes, Route, Navigate, useNavigate, Outlet } from 'react-router-dom';
-import Layout from './components/Layout';
-// import Pending from './pages/Pending';
-// import Complete from './pages/Complete';
-import Profile from './components/Profile';
-import Dashboard from './pages/Dashboard'
-import Login from './components/Login.jsx';
-import SignUp from './components/SignUp.jsx';
-import './index.css';
-import PendingPage from './pages/PendingPage';
-import CompletePage from './pages/CompletePage';
+import React, { useState, useEffect } from "react";
+import { Routes, Route, Navigate, useNavigate, Outlet } from "react-router-dom";
+import Layout from "./components/Layout";
+import Profile from "./components/Profile";
+import Dashboard from "./pages/Dashboard";
+import Login from "./components/Login.jsx";
+import SignUp from "./components/SignUp.jsx";
+import PendingPage from "./pages/PendingPage";
+import CompletePage from "./pages/CompletePage";
+import "./index.css";
 
 const App = () => {
   const navigate = useNavigate();
-  const [currentUser, setCurrentUser] = useState(() => {
-    const stored = localStorage.getItem('currentUser');
-    return stored ? JSON.parse(stored) : null;
-  });
+  const [currentUser, setCurrentUser] = useState(null);
 
   useEffect(() => {
-    if (currentUser) {
-      localStorage.setItem('currentUser', JSON.stringify(currentUser));
-    } else {
-      localStorage.removeItem('currentUser');
-    }
-  }, [currentUser]);
+    const stored = localStorage.getItem("currentUser");
+    if (stored) setCurrentUser(JSON.parse(stored));
+  }, []);
 
-  const handleAuthSubmit = data => {
-    const user = {
-      email: data.email,
-      name: data.name || 'User',
-      avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(data.name || 'User')}&background=random`
-    };
-    setCurrentUser(user);
-    navigate('/', { replace: true });
+  const handleAuthSubmit = (data) => {
+    setCurrentUser(data);
+    localStorage.setItem("currentUser", JSON.stringify(data));
+    navigate("/", { replace: true });
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
+    localStorage.removeItem("token");
+    localStorage.removeItem("currentUser");
     setCurrentUser(null);
-    navigate('/Login', { replace: true });
+    navigate("/login", { replace: true });
   };
 
   const ProtectedLayout = () => (
@@ -142,34 +129,59 @@ const App = () => {
 
   return (
     <Routes>
+      {/* Login */}
       <Route
-        path="/Login"
+        path="/login"
         element={
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-            <Login onSubmit={handleAuthSubmit} onSwitchMode={() => navigate('/Signup')} />
-          </div>} />
- <Route
-        path="/SignUp"
+            <Login
+              onSubmit={handleAuthSubmit}
+              onSwitchMode={() => navigate("/signup")}
+            />
+          </div>
+        }
+      />
+
+      {/* Signup */}
+      <Route
+        path="/signup"
         element={
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-            <SignUp onSubmit={handleAuthSubmit} onSwitchMode={() => navigate('/Login')} />
-          </div>} />
+            <SignUp
+              onSubmit={handleAuthSubmit}
+              onSwitchMode={() => navigate("/login")}
+            />
+          </div>
+        }
+      />
 
-
+      {/* Protected Routes */}
       <Route
         element={
-          currentUser
-            ? <ProtectedLayout />
-            : <Navigate to="/Login" replace />
-        }>
-          <Route path ='/' element={<Dashboard/>} />
-          <Route path='/pending' element={<PendingPage/>}/>
-          <Route path='/complete' element={<CompletePage/>}/>
-          <Route path='/profile' element={<Profile user={currentUser} setCurrentUser={setCurrentUser} onLogout={handleLogout}/>}/>
-          </Route>
-          <Route path='*' element={<Navigate to={currentUser ? '/' : '/Login'} replace/>}/>
-          </Routes>
+          currentUser ? <ProtectedLayout /> : <Navigate to="/login" replace />
+        }
+      >
+        <Route path="/" element={<Dashboard />} />
+        <Route path="/pending" element={<PendingPage />} />
+        <Route path="/complete" element={<CompletePage />} />
+        <Route
+          path="/profile"
+          element={
+            <Profile
+              user={currentUser}
+              setCurrentUser={setCurrentUser}
+              onLogout={handleLogout}
+            />
+          }
+        />
+      </Route>
 
+      {/* Fallback */}
+      <Route
+        path="*"
+        element={<Navigate to={currentUser ? "/" : "/login"} replace />}
+      />
+    </Routes>
   );
 };
 
