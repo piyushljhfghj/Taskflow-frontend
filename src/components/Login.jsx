@@ -242,7 +242,7 @@ import { INPUTWRAPPER, BUTTON_CLASSES } from "../assets/dummy";
 
 const INITIAL_FORM = { email: "", password: "" };
 // ✅ use one backend URL (switch between local & prod easily)
-const url = import.meta.env.VITE_API_URL || "http://localhost:4000";
+const url = import.meta.env.VITE_API_URL || "https://server-tflow.onrender.com";
 
 const Login = ({ onSubmit, onSwitchMode }) => {
   const [showPassword, setShowPassword] = useState(false);
