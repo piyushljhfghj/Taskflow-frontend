@@ -3,9 +3,7 @@ import { Outlet } from "react-router-dom";
 import { Circle, TrendingUp, Zap, Clock } from "lucide-react";
 import Navbar from "./Navbar";
 import Sidebar from "./Sidebar";
-import axios from "axios";
-
-const url = import.meta.env.VITE_API_URL || "http://localhost:4000";
+import API from "../api"; // ✅ import centralized axios instance
 
 const Layout = ({ user, onLogout }) => {
   const [tasks, setTasks] = useState([]);
@@ -19,9 +17,7 @@ const Layout = ({ user, onLogout }) => {
       const token = localStorage.getItem("token");
       if (!token) throw new Error("No auth token found");
 
-      const { data } = await axios.get(`${url}/api/tasks/gp`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const { data } = await API.get("/api/tasks/gp"); // ✅ headers handled inside API interceptors
 
       const arr = Array.isArray(data)
         ? data
@@ -34,9 +30,9 @@ const Layout = ({ user, onLogout }) => {
       setTasks(arr);
     } catch (err) {
       console.error(err);
-      setError(err.message || "Could not load tasks.");
+      setError(err.response?.data?.message || err.message || "Could not load tasks.");
       if (err.response?.status === 401) {
-        onLogout(); // only logout if token invalid
+        onLogout(); // logout if token invalid
       }
     } finally {
       setLoading(false);
@@ -61,8 +57,6 @@ const Layout = ({ user, onLogout }) => {
 
     return { totalCount, completedTasks, pendingCount, completionPercentage };
   }, [tasks]);
-
-  // ... rest of your layout rendering (stat cards, sidebar, navbar) unchanged
 
   return (
     <div className="min-h-screen bg-gray-50">

@@ -233,6 +233,7 @@ import { Mail, Lock, Eye, EyeOff, LogIn } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import API from "../api";
 import { FcGoogle } from "react-icons/fc";
 import { signInWithPopup } from "firebase/auth";
 import { auth, googleProvider } from "../firebase";
@@ -268,8 +269,7 @@ const Login = ({ onSubmit, onSwitchMode }) => {
     }
     setLoading(true);
     try {
-     const { data } = await axios.post(`${url}/api/user/login`, formData);
-localStorage.setItem("token", data.token);  // ✅ must store backend JWT
+    const { data } = await API.post("/api/user/login", formData);
 
 
       // Prepare consistent user object

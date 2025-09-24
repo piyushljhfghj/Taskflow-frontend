@@ -1,9 +1,16 @@
-// src/api.js
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: "https://server-tflow.onrender.com",  // ✅ single place to update
+  baseURL: import.meta.env.VITE_API_URL,
+});
+
+// Add token automatically if exists
+API.interceptors.request.use(config => {
+  const token = localStorage.getItem("token");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
 });
 
 export default API;
-  
