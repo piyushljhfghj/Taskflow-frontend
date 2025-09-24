@@ -227,8 +227,6 @@
 
 // export default Login
 
-
-
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { Mail, Lock, Eye, EyeOff, LogIn } from "lucide-react";
@@ -241,8 +239,7 @@ import { auth, googleProvider } from "../firebase";
 import { INPUTWRAPPER, BUTTON_CLASSES } from "../assets/dummy";
 
 const INITIAL_FORM = { email: "", password: "" };
-// ✅ use one backend URL (switch between local & prod easily)
-const url = import.meta.env.VITE_API_URL || "https://server-tflow.onrender.com";
+const url = import.meta.env.VITE_API_URL || "http://localhost:4000";
 
 const Login = ({ onSubmit, onSwitchMode }) => {
   const [showPassword, setShowPassword] = useState(false);
@@ -254,27 +251,15 @@ const Login = ({ onSubmit, onSwitchMode }) => {
   // Auto-login session restore
   useEffect(() => {
     const token = localStorage.getItem("token");
-    if (token) {
-      (async () => {
-        try {
-          const { data } = await axios.get(`${url}/api/user/me`, {
-            headers: { Authorization: `Bearer ${token}` },
-          });
-          if (data.success) {
-            onSubmit?.({ token, ...data.user });
-            toast.success("Session restored!");
-            navigate("/");
-          } else {
-            localStorage.clear();
-          }
-        } catch {
-          localStorage.clear();
-        }
-      })();
+    const storedUser = localStorage.getItem("currentUser");
+    if (token && storedUser) {
+      onSubmit?.(JSON.parse(storedUser));
+      navigate("/");
+      toast.success("Session restored!");
     }
   }, [navigate, onSubmit]);
 
-  // Email-password login
+  // Manual login
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!rememberMe) {
@@ -286,10 +271,19 @@ const Login = ({ onSubmit, onSwitchMode }) => {
       const { data } = await axios.post(`${url}/api/user/login`, formData);
       if (!data.token) throw new Error(data.message || "Login failed.");
 
+      // Prepare consistent user object
+      const userData = {
+        id: data.user._id || data.user.id,
+        name: data.user.name,
+        email: data.user.email,
+        avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(data.user.name)}&background=random`,
+      };
+
       localStorage.setItem("token", data.token);
-      onSubmit?.({ token: data.token, ...data.user });
+      localStorage.setItem("currentUser", JSON.stringify(userData));
+      onSubmit?.(userData);
       toast.success("Login successful!");
-      setTimeout(() => navigate("/"), 1000);
+      navigate("/");
     } catch (err) {
       const msg = err.response?.data?.message || err.message;
       toast.error(msg);
@@ -308,10 +302,19 @@ const Login = ({ onSubmit, onSwitchMode }) => {
       const { data } = await axios.post(`${url}/api/auth/google`, {
         token: firebaseToken,
       });
+
       if (!data.success) throw new Error("Google login failed");
 
+      const googleUserData = {
+        id: data.user._id || data.user.id,
+        name: data.user.name,
+        email: data.user.email,
+        avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(data.user.name)}&background=random`,
+      };
+
       localStorage.setItem("token", data.token);
-      onSubmit?.({ token: data.token, ...data.user });
+      localStorage.setItem("currentUser", JSON.stringify(googleUserData));
+      onSubmit?.(googleUserData);
 
       toast.success("Logged in with Google!");
       navigate("/");
@@ -339,9 +342,7 @@ const Login = ({ onSubmit, onSwitchMode }) => {
             type="email"
             placeholder="Email"
             value={formData.email}
-            onChange={(e) =>
-              setFormData({ ...formData, email: e.target.value })
-            }
+            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
             className="w-full focus:outline-none text-sm text-gray-700"
             required
           />
@@ -353,9 +354,7 @@ const Login = ({ onSubmit, onSwitchMode }) => {
             type={showPassword ? "text" : "password"}
             placeholder="Password"
             value={formData.password}
-            onChange={(e) =>
-              setFormData({ ...formData, password: e.target.value })
-            }
+            onChange={(e) => setFormData({ ...formData, password: e.target.value })}
             className="w-full focus:outline-none text-sm text-gray-700"
             required
           />
@@ -364,11 +363,7 @@ const Login = ({ onSubmit, onSwitchMode }) => {
             onClick={() => setShowPassword((prev) => !prev)}
             className="ml-2 text-gray-500 hover:text-purple-500 transition-colors"
           >
-            {showPassword ? (
-              <EyeOff className="w-5 h-5" />
-            ) : (
-              <Eye className="w-5 h-5" />
-            )}
+            {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
           </button>
         </div>
 
@@ -391,7 +386,7 @@ const Login = ({ onSubmit, onSwitchMode }) => {
         </button>
       </form>
 
-      {/* Google Login Button */}
+      {/* Google Login */}
       <div className="mt-4">
         <button
           onClick={handleGoogleLogin}
@@ -399,9 +394,7 @@ const Login = ({ onSubmit, onSwitchMode }) => {
           className="w-full border border-gray-300 rounded-lg py-2 px-4 flex items-center justify-center gap-2 hover:bg-gray-100 transition"
         >
           <FcGoogle className="w-5 h-5" />
-          <span className="text-sm font-medium text-gray-700">
-            Continue with Google
-          </span>
+          <span className="text-sm font-medium text-gray-700">Continue with Google</span>
         </button>
       </div>
 

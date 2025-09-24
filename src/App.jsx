@@ -101,12 +101,18 @@ import "./index.css";
 
 const App = () => {
   const navigate = useNavigate();
-  const [currentUser, setCurrentUser] = useState(null);
+  const [currentUser, setCurrentUser] = useState(() => {
+    const stored = localStorage.getItem("currentUser");
+    return stored ? JSON.parse(stored) : null;
+  });
 
   useEffect(() => {
-    const stored = localStorage.getItem("currentUser");
-    if (stored) setCurrentUser(JSON.parse(stored));
-  }, []);
+    if (currentUser) {
+      localStorage.setItem("currentUser", JSON.stringify(currentUser));
+    } else {
+      localStorage.removeItem("currentUser");
+    }
+  }, [currentUser]);
 
   const handleAuthSubmit = (data) => {
     setCurrentUser(data);
@@ -129,58 +135,34 @@ const App = () => {
 
   return (
     <Routes>
-      {/* Login */}
       <Route
         path="/login"
         element={
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-            <Login
-              onSubmit={handleAuthSubmit}
-              onSwitchMode={() => navigate("/signup")}
-            />
+            <Login onSubmit={handleAuthSubmit} onSwitchMode={() => navigate("/signup")} />
           </div>
         }
       />
-
-      {/* Signup */}
       <Route
         path="/signup"
         element={
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-            <SignUp
-              onSubmit={handleAuthSubmit}
-              onSwitchMode={() => navigate("/login")}
-            />
+            <SignUp onSubmit={handleAuthSubmit} onSwitchMode={() => navigate("/login")} />
           </div>
         }
       />
 
-      {/* Protected Routes */}
-      <Route
-        element={
-          currentUser ? <ProtectedLayout /> : <Navigate to="/login" replace />
-        }
-      >
+      <Route element={currentUser ? <ProtectedLayout /> : <Navigate to="/login" replace />}>
         <Route path="/" element={<Dashboard />} />
         <Route path="/pending" element={<PendingPage />} />
         <Route path="/complete" element={<CompletePage />} />
         <Route
           path="/profile"
-          element={
-            <Profile
-              user={currentUser}
-              setCurrentUser={setCurrentUser}
-              onLogout={handleLogout}
-            />
-          }
+          element={<Profile user={currentUser} setCurrentUser={setCurrentUser} onLogout={handleLogout} />}
         />
       </Route>
 
-      {/* Fallback */}
-      <Route
-        path="*"
-        element={<Navigate to={currentUser ? "/" : "/login"} replace />}
-      />
+      <Route path="*" element={<Navigate to={currentUser ? "/" : "/login"} replace />} />
     </Routes>
   );
 };
