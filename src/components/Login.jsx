@@ -268,8 +268,9 @@ const Login = ({ onSubmit, onSwitchMode }) => {
     }
     setLoading(true);
     try {
-      const { data } = await axios.post(`${url}/api/user/login`, formData);
-      if (!data.token) throw new Error(data.message || "Login failed.");
+     const { data } = await axios.post(`${url}/api/user/login`, formData);
+localStorage.setItem("token", data.token);  // ✅ must store backend JWT
+
 
       // Prepare consistent user object
       const userData = {
@@ -293,35 +294,36 @@ const Login = ({ onSubmit, onSwitchMode }) => {
   };
 
   // Google login
-  const handleGoogleLogin = async () => {
-    try {
-      const result = await signInWithPopup(auth, googleProvider);
-      const firebaseUser = result.user;
-      const firebaseToken = await firebaseUser.getIdToken();
+ const handleGoogleLogin = async () => {
+  try {
+    const result = await signInWithPopup(auth, googleProvider);
+    const firebaseUser = result.user;
+    const firebaseToken = await firebaseUser.getIdToken();
 
-      const { data } = await axios.post(`${url}/api/auth/google`, {
-        token: firebaseToken,
-      });
+    // Send Firebase token to backend
+    const { data } = await axios.post(`${url}/api/auth/google`, { token: firebaseToken });
 
-      if (!data.success) throw new Error("Google login failed");
+    if (!data.success) throw new Error("Google login failed");
 
-      const googleUserData = {
-        id: data.user._id || data.user.id,
-        name: data.user.name,
-        email: data.user.email,
-        avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(data.user.name)}&background=random`,
-      };
+    // Store JWT + user in localStorage
+    localStorage.setItem("token", data.token);
 
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("currentUser", JSON.stringify(googleUserData));
-      onSubmit?.(googleUserData);
+    const googleUserData = {
+      id: data.user._id || data.user.id,
+      name: data.user.name,
+      email: data.user.email,
+      avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(data.user.name)}&background=random`,
+    };
 
-      toast.success("Logged in with Google!");
-      navigate("/");
-    } catch (error) {
-      toast.error(error.message);
-    }
-  };
+    localStorage.setItem("currentUser", JSON.stringify(googleUserData));
+    onSubmit?.(googleUserData);
+
+    toast.success("Logged in with Google!");
+    navigate("/");
+  } catch (error) {
+    toast.error(error.message);
+  }
+};
 
   return (
     <div className="max-w-md w-full bg-white shadow-lg border border-purple-100 rounded-xl p-8">
