@@ -97,8 +97,8 @@ import Layout from './components/Layout';
 // import Complete from './pages/Complete';
 import Profile from './components/Profile';
 import Dashboard from './pages/Dashboard'
-import Login from './components/Login';
-import SignUp from './components/SignUp';
+import Login from './components/Login.jsx';
+import SignUp from './components/SignUp.jsx';
 import './index.css';
 import PendingPage from './pages/PendingPage';
 import CompletePage from './pages/CompletePage';
