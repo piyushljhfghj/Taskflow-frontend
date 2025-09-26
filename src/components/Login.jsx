@@ -6,6 +6,7 @@
 import { auth, googleProvider } from "../firebase";
 import { signInWithPopup } from "firebase/auth";
 import axios from "axios";
+import { FcGoogle } from "react-icons/fc";
 
 // ✅ define API URL once
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:4000";
