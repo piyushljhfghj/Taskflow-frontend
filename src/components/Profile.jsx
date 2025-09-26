@@ -5,11 +5,8 @@ import { useNavigate } from "react-router-dom"
 import { toast, ToastContainer } from "react-toastify"
 import "react-toastify/dist/ReactToastify.css"
 
+import API from "../api";
 import { INPUT_WRAPPER, FULL_BUTTON, SECTION_WRAPPER, BACK_BUTTON, DANGER_BTN, personalFields, securityFields } from '../assets/dummy'
-
-// Constants & Dummy Data
-// const API_URL = "http://localhost:4000"
-const API_URL = "https://server-tflow.onrender.com"
 
 
 

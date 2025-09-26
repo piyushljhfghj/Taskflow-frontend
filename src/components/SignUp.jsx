@@ -42,11 +42,8 @@ import { UserPlus, Mail, Lock, User } from "lucide-react"
 import React, { useState } from "react"
 import axios from "axios"
 import { Inputwrapper } from "../assets/dummy"
+import API from "../api";
 
-// const API_URL = "http://localhost:4000"
-
-const API_URL = "https://server-tflow.onrender.com"
-// 
 const INITIAL_FORM = { name: "", email: "", password: "" }
 
 const SignUp = ({ onSwitchMode, onSubmit }) => {

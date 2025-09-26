@@ -1,9 +1,8 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { Outlet } from "react-router-dom";
-import { Circle, TrendingUp, Zap, Clock } from "lucide-react";
 import Navbar from "./Navbar";
 import Sidebar from "./Sidebar";
-import API from "../api"; // ✅ import centralized axios instance
+import API from "../api"; // ✅ use centralized API
 
 const Layout = ({ user, onLogout }) => {
   const [tasks, setTasks] = useState([]);
@@ -14,10 +13,7 @@ const Layout = ({ user, onLogout }) => {
     setLoading(true);
     setError(null);
     try {
-      const token = localStorage.getItem("token");
-      if (!token) throw new Error("No auth token found");
-
-      const { data } = await API.get("/api/tasks/gp"); // ✅ headers handled inside API interceptors
+      const { data } = await API.get("/api/tasks/gp"); // ✅ token auto-attached
 
       const arr = Array.isArray(data)
         ? data
@@ -29,8 +25,9 @@ const Layout = ({ user, onLogout }) => {
 
       setTasks(arr);
     } catch (err) {
-      console.error(err);
+      console.error("Error fetching tasks:", err);
       setError(err.response?.data?.message || err.message || "Could not load tasks.");
+
       if (err.response?.status === 401) {
         onLogout(); // logout if token invalid
       }
@@ -53,7 +50,9 @@ const Layout = ({ user, onLogout }) => {
 
     const totalCount = tasks.length;
     const pendingCount = totalCount - completedTasks;
-    const completionPercentage = totalCount ? Math.round((completedTasks / totalCount) * 100) : 0;
+    const completionPercentage = totalCount
+      ? Math.round((completedTasks / totalCount) * 100)
+      : 0;
 
     return { totalCount, completedTasks, pendingCount, completionPercentage };
   }, [tasks]);
@@ -63,6 +62,8 @@ const Layout = ({ user, onLogout }) => {
       <Navbar user={user} onLogout={onLogout} />
       <Sidebar user={user} tasks={tasks} />
       <div className="ml-0 xl:ml-64 lg:ml-64 md:ml-16 pt-16 p-3 sm:p-4 md:p-4 transition-all duration-300">
+        {loading && <p>Loading tasks...</p>}
+        {error && <p className="text-red-500">{error}</p>}
         <Outlet context={{ tasks, refreshTasks: fetchTasks }} />
       </div>
     </div>

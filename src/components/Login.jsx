@@ -226,9 +226,7 @@
 // }
 
 // export default Login
-
 import { useState, useEffect } from "react";
-import axios from "axios";
 import { Mail, Lock, Eye, EyeOff, LogIn } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
@@ -240,7 +238,6 @@ import { auth, googleProvider } from "../firebase";
 import { INPUTWRAPPER, BUTTON_CLASSES } from "../assets/dummy";
 
 const INITIAL_FORM = { email: "", password: "" };
-const url = import.meta.env.VITE_API_URL || "https://server-tflow.onrender.com";
 
 const Login = ({ onSubmit, onSwitchMode }) => {
   const [showPassword, setShowPassword] = useState(false);
@@ -249,7 +246,7 @@ const Login = ({ onSubmit, onSwitchMode }) => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  // Auto-login session restore
+  // Auto-login restore
   useEffect(() => {
     const token = localStorage.getItem("token");
     const storedUser = localStorage.getItem("currentUser");
@@ -260,7 +257,6 @@ const Login = ({ onSubmit, onSwitchMode }) => {
     }
   }, [navigate, onSubmit]);
 
-  // Manual login
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!rememberMe) {
@@ -269,15 +265,15 @@ const Login = ({ onSubmit, onSwitchMode }) => {
     }
     setLoading(true);
     try {
-    const { data } = await API.post("/api/user/login", formData);
+      const { data } = await API.post("/api/user/login", formData);
 
-
-      // Prepare consistent user object
       const userData = {
         id: data.user._id || data.user.id,
         name: data.user.name,
         email: data.user.email,
-        avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(data.user.name)}&background=random`,
+        avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(
+          data.user.name
+        )}&background=random`,
       };
 
       localStorage.setItem("token", data.token);
@@ -286,44 +282,43 @@ const Login = ({ onSubmit, onSwitchMode }) => {
       toast.success("Login successful!");
       navigate("/");
     } catch (err) {
-      const msg = err.response?.data?.message || err.message;
-      toast.error(msg);
+      toast.error(err.response?.data?.message || err.message);
     } finally {
       setLoading(false);
     }
   };
 
-  // Google login
- const handleGoogleLogin = async () => {
-  try {
-    const result = await signInWithPopup(auth, googleProvider);
-    const firebaseUser = result.user;
-    const firebaseToken = await firebaseUser.getIdToken();
+  const handleGoogleLogin = async () => {
+    try {
+      const result = await signInWithPopup(auth, googleProvider);
+      const firebaseUser = result.user;
+      const firebaseToken = await firebaseUser.getIdToken();
 
-    // Send Firebase token to backend
-    const { data } = await axios.post(`${url}/api/auth/google`, { token: firebaseToken });
+      const { data } = await API.post("/api/auth/google", {
+        token: firebaseToken,
+      });
 
-    if (!data.success) throw new Error("Google login failed");
+      if (!data.success) throw new Error("Google login failed");
 
-    // Store JWT + user in localStorage
-    localStorage.setItem("token", data.token);
+      const googleUserData = {
+        id: data.user._id || data.user.id,
+        name: data.user.name,
+        email: data.user.email,
+        avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(
+          data.user.name
+        )}&background=random`,
+      };
 
-    const googleUserData = {
-      id: data.user._id || data.user.id,
-      name: data.user.name,
-      email: data.user.email,
-      avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(data.user.name)}&background=random`,
-    };
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("currentUser", JSON.stringify(googleUserData));
+      onSubmit?.(googleUserData);
 
-    localStorage.setItem("currentUser", JSON.stringify(googleUserData));
-    onSubmit?.(googleUserData);
-
-    toast.success("Logged in with Google!");
-    navigate("/");
-  } catch (error) {
-    toast.error(error.message);
-  }
-};
+      toast.success("Logged in with Google!");
+      navigate("/");
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
 
   return (
     <div className="max-w-md w-full bg-white shadow-lg border border-purple-100 rounded-xl p-8">
@@ -336,7 +331,6 @@ const Login = ({ onSubmit, onSwitchMode }) => {
         <p className="text-gray-500 text-sm mt-1">Sign in to continue</p>
       </div>
 
-      {/* Email/Password Form */}
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className={INPUTWRAPPER}>
           <Mail className="text-purple-500 w-5 h-5 mr-2" />
@@ -344,7 +338,9 @@ const Login = ({ onSubmit, onSwitchMode }) => {
             type="email"
             placeholder="Email"
             value={formData.email}
-            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+            onChange={(e) =>
+              setFormData({ ...formData, email: e.target.value })
+            }
             className="w-full focus:outline-none text-sm text-gray-700"
             required
           />
@@ -356,7 +352,9 @@ const Login = ({ onSubmit, onSwitchMode }) => {
             type={showPassword ? "text" : "password"}
             placeholder="Password"
             value={formData.password}
-            onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+            onChange={(e) =>
+              setFormData({ ...formData, password: e.target.value })
+            }
             className="w-full focus:outline-none text-sm text-gray-700"
             required
           />
@@ -365,7 +363,11 @@ const Login = ({ onSubmit, onSwitchMode }) => {
             onClick={() => setShowPassword((prev) => !prev)}
             className="ml-2 text-gray-500 hover:text-purple-500 transition-colors"
           >
-            {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+            {showPassword ? (
+              <EyeOff className="w-5 h-5" />
+            ) : (
+              <Eye className="w-5 h-5" />
+            )}
           </button>
         </div>
 
@@ -384,11 +386,16 @@ const Login = ({ onSubmit, onSwitchMode }) => {
         </div>
 
         <button type="submit" className={BUTTON_CLASSES} disabled={loading}>
-          {loading ? "Logging in..." : <><LogIn className="w-4 h-4" /> Login</>}
+          {loading ? (
+            "Logging in..."
+          ) : (
+            <>
+              <LogIn className="w-4 h-4" /> Login
+            </>
+          )}
         </button>
       </form>
 
-      {/* Google Login */}
       <div className="mt-4">
         <button
           onClick={handleGoogleLogin}
@@ -396,7 +403,9 @@ const Login = ({ onSubmit, onSwitchMode }) => {
           className="w-full border border-gray-300 rounded-lg py-2 px-4 flex items-center justify-center gap-2 hover:bg-gray-100 transition"
         >
           <FcGoogle className="w-5 h-5" />
-          <span className="text-sm font-medium text-gray-700">Continue with Google</span>
+          <span className="text-sm font-medium text-gray-700">
+            Continue with Google
+          </span>
         </button>
       </div>
 
