@@ -90,7 +90,7 @@
 
 import React, { useState, useEffect } from "react";
 import { Routes, Route, Navigate, useNavigate, Outlet } from "react-router-dom";
-import Layout from "./components/Layout";
+import Layout from "./components/Layout.jsx";
 import Profile from "./components/Profile";
 import Dashboard from "./pages/Dashboard";
 import Login from "./components/Login.jsx";
