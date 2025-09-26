@@ -2,34 +2,38 @@
 // yeh hai google authentication ka code/
 
 // Login.jsx (add at the top)
-import { auth, googleProvider } from "../firebase"
-import { signInWithPopup } from "firebase/auth"
-import { FcGoogle } from "react-icons/fc"
+// Login.jsx
+import { auth, googleProvider } from "../firebase";
+import { signInWithPopup } from "firebase/auth";
+import axios from "axios";
 
-// inside Login component
+// ✅ define API URL once
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:4000";
+
 const handleGoogleLogin = async () => {
   try {
+    // 1. Sign in with Google
     const result = await signInWithPopup(auth, googleProvider);
-    const firebaseUser = result.user;
-    const firebaseToken = await firebaseUser.getIdToken();
 
-    // 🔑 Send Firebase token to backend
-    const { data } = await axios.post(`${url}/api/auth/google`, { token: firebaseToken });
+    // 2. Get Firebase ID token
+    const idToken = await result.user.getIdToken();
 
-    if (!data.success) throw new Error("Google login failed");
+    // 3. Send token to backend
+    const res = await axios.post(`${API_URL}/api/auth/google`, {
+      token: idToken,
+    });
 
-    // ✅ Store backend JWT + user
-    localStorage.setItem("token", data.token);
-    localStorage.setItem("userId", data.user._id);
+    // 4. Save your backend JWT
+    localStorage.setItem("token", res.data.token);
 
-    onSubmit?.({ token: data.token, userId: data.user._id, ...data.user });
-
-    toast.success("Logged in with Google! Redirecting...");
-    navigate("/");
+    alert("Google login successful!");
+    // redirect to dashboard, etc.
   } catch (error) {
-    toast.error(error.message);
+    console.error("Google login error:", error);
+    alert("Login failed!");
   }
 };
+
 
 // --------------------------------------------------------
 
