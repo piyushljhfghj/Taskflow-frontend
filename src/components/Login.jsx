@@ -236,7 +236,7 @@ import { useState } from "react";
 import { Mail, Lock, Eye, EyeOff, LogIn } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
-import OTPVerification from "./otpVerification";
+import OTPVerification from "./OTPVerification";
 import axios from "axios";
 import { FcGoogle } from "react-icons/fc";
 import { auth, googleProvider } from "../firebase";

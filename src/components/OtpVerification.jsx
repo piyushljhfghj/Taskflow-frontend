@@ -6,7 +6,7 @@ import "react-toastify/dist/ReactToastify.css";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:4000";
 
-const otpVerification = ({ email, onVerified }) => {
+const OTPVerification = ({ email, onVerified }) => {
   const [otp, setOtp] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -53,4 +53,4 @@ const otpVerification = ({ email, onVerified }) => {
   );
 };
 
-export default otpVerification;
+export default OTPVerification;
