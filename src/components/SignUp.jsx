@@ -202,7 +202,7 @@ import { useState } from "react";
 import { UserPlus, Mail, Lock, User } from "lucide-react";
 import { FcGoogle } from "react-icons/fc";
 import axios from "axios";
-import OTPVerification from "./OTPVerification";
+import OTPVerification from "./otpVerification";
 import { auth, googleProvider } from "../firebase";
 import { signInWithPopup } from "firebase/auth";
 
