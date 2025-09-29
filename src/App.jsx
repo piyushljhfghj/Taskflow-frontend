@@ -94,7 +94,7 @@ import Profile from "./components/Profile.jsx";
 
 import Login from "./components/Login.jsx";
 import SignUp from "./components/SignUp.jsx";
-import OTPVerification from "./components/OTPVerification.jsx";
+import OTPVerification from "./components/OTPVerification";
 
 import "./index.css";
 
