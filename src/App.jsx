@@ -94,7 +94,7 @@ import Profile from "./components/Profile.jsx";
 
 import Login from "./components/Login.jsx";
 import SignUp from "./components/SignUp.jsx";
-import OTPVerification from "./components/otpVerification.jsx";
+import otpVerification from "./components/otpVerification.jsx";
 
 import "./index.css";
 
@@ -148,7 +148,7 @@ const App = () => {
         element={
           pendingOtp ? (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-              <OTPVerification
+              <otpVerification
                 email={pendingOtp}
                 onVerified={() =>
                   handleAuthSubmit({
@@ -175,7 +175,7 @@ const App = () => {
         element={
           pendingOtp ? (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-              <OTPVerification
+              <otpVerification
                 email={pendingOtp}
                 onVerified={() =>
                   handleAuthSubmit({
