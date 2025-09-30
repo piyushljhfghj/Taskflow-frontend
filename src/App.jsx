@@ -82,7 +82,7 @@
 // export default App;
 
 
-// src/App.jsx
+//  src/App.jsx
 import React, { useState, useEffect } from "react";
 import { Routes, Route, Navigate, useNavigate, Outlet } from "react-router-dom";
 
@@ -94,7 +94,7 @@ import Profile from "./components/Profile.jsx";
 
 import Login from "./components/Login.jsx";
 import SignUp from "./components/SignUp.jsx";
-import OTPVerification from "../components/OtpVerification.jsx";
+import OtpVerification from "./components/OtpVerification.jsx"; // ✅ fixed path + case
 
 import "./index.css";
 
@@ -148,7 +148,7 @@ const App = () => {
         element={
           pendingOtp ? (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-              <OTPVerification
+              <OtpVerification
                 email={pendingOtp}
                 onVerified={() =>
                   handleAuthSubmit({
@@ -175,7 +175,7 @@ const App = () => {
         element={
           pendingOtp ? (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-              <OTPVerification
+              <OtpVerification
                 email={pendingOtp}
                 onVerified={() =>
                   handleAuthSubmit({
@@ -220,3 +220,4 @@ const App = () => {
 };
 
 export default App;
+

@@ -1,4 +1,5 @@
-// src/components/OTPVerification.jsx
+
+// src/components/OtpVerification.jsx
 import React, { useState } from "react";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
@@ -6,7 +7,7 @@ import "react-toastify/dist/ReactToastify.css";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:4000";
 
-const OTPVerification = ({ email, onVerified }) => {
+const OtpVerification = ({ email, onVerified }) => {
   const [otp, setOtp] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -30,7 +31,9 @@ const OTPVerification = ({ email, onVerified }) => {
     <div className="max-w-md w-full bg-white shadow-lg border border-purple-100 rounded-xl p-8">
       <ToastContainer position="top-center" autoClose={3000} hideProgressBar />
       <h2 className="text-2xl font-bold text-center mb-4">OTP Verification</h2>
-      <p className="text-center text-gray-500 mb-4">Enter the OTP sent to <strong>{email}</strong></p>
+      <p className="text-center text-gray-500 mb-4">
+        Enter the OTP sent to <strong>{email}</strong>
+      </p>
 
       <form onSubmit={handleVerify} className="space-y-4">
         <input
@@ -53,4 +56,4 @@ const OTPVerification = ({ email, onVerified }) => {
   );
 };
 
-export default OTPVerification;
+export default OtpVerification;
