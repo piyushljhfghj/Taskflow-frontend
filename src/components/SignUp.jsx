@@ -199,7 +199,7 @@
 
 // src/components/SignUp.jsx
 import { useState } from "react";
-import { UserPlus, Mail, Lock, User } from "lucide-react";
+import { Mail, Lock, User } from "lucide-react";
 import { FcGoogle } from "react-icons/fc";
 import axios from "axios";
 import OTPVerification from "./OTPVerification";
@@ -209,18 +209,28 @@ import { signInWithPopup } from "firebase/auth";
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:4000";
 
 const SignUp = ({ onSwitchMode, onSubmit }) => {
+  const [message, setMessage] = useState("");
   const [formData, setFormData] = useState({ name: "", email: "", password: "" });
   const [loading, setLoading] = useState(false);
   const [otpEmail, setOtpEmail] = useState(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (formData.password.length < 8) {
+      alert("Password must be at least 8 characters.");
+      return;
+    }
+
     setLoading(true);
+    console.log("Submitting signup:", formData);
+
     try {
       const { data } = await axios.post(`${API_URL}/api/user/register`, formData);
-      setOtpEmail(data.email); // redirect to OTP
+      setOtpEmail(data.user?.email || formData.email); // fallback
     } catch (err) {
-      alert(err.response?.data?.msg || err.message);
+      console.error("Signup error:", err.response?.data || err.message);
+      alert(err.response?.data?.message || err.message);
     } finally {
       setLoading(false);
     }
@@ -230,17 +240,34 @@ const SignUp = ({ onSwitchMode, onSubmit }) => {
     try {
       const result = await signInWithPopup(auth, googleProvider);
       const idToken = await result.user.getIdToken();
+
       const res = await axios.post(`${API_URL}/api/auth/google`, { token: idToken });
       localStorage.setItem("token", res.data.token);
-      onSubmit?.({ token: res.data.token, userId: res.data.user.id, ...res.data.user });
+
+      onSubmit?.({
+        token: res.data.token,
+        userId: res.data.user.id,
+        ...res.data.user,
+      });
     } catch (err) {
-      console.error(err);
+      console.error("Google signup error:", err);
       alert("Google signup failed!");
     }
   };
 
-  if (otpEmail)
-    return <OTPVerification email={otpEmail} onVerified={() => onSubmit({ token: localStorage.getItem("token"), email: otpEmail })} />;
+  if (otpEmail) {
+    return (
+      <OTPVerification
+        email={otpEmail}
+        onVerified={() =>
+          onSubmit({
+            token: localStorage.getItem("token"),
+            email: otpEmail,
+          })
+        }
+      />
+    );
+  }
 
   return (
     <div className="max-w-md w-full bg-white shadow-lg border border-purple-100 rounded-xl p-8">
@@ -261,17 +288,28 @@ const SignUp = ({ onSwitchMode, onSubmit }) => {
             />
           </div>
         ))}
-        <button type="submit" className="w-full bg-purple-600 hover:bg-purple-700 text-white py-2 rounded-lg">
+        <button
+          type="submit"
+          className="w-full bg-purple-600 hover:bg-purple-700 text-white py-2 rounded-lg"
+        >
           {loading ? "Signing Up..." : "Sign Up"}
         </button>
       </form>
+
       <div className="mt-4">
-        <button onClick={handleGoogleSignUp} className="w-full border border-gray-300 rounded-lg py-2 flex items-center justify-center gap-2">
+        <button
+          onClick={handleGoogleSignUp}
+          className="w-full border border-gray-300 rounded-lg py-2 flex items-center justify-center gap-2"
+        >
           <FcGoogle /> Sign Up with Google
         </button>
       </div>
+
       <p className="text-center mt-4">
-        Already have an account? <button onClick={onSwitchMode} className="text-purple-600">Login</button>
+        Already have an account?{" "}
+        <button onClick={onSwitchMode} className="text-purple-600">
+          Login
+        </button>
       </p>
     </div>
   );

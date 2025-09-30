@@ -245,6 +245,7 @@ import { signInWithPopup } from "firebase/auth";
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:4000";
 
 const Login = ({ onSubmit, onSwitchMode }) => {
+  const [message, setMessage] = useState(""); 
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
   const [otpEmail, setOtpEmail] = useState(null);
