@@ -1,5 +1,3 @@
-
-// src/components/OtpVerification.jsx
 import React, { useState } from "react";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
@@ -11,11 +9,21 @@ const OtpVerification = ({ email, onVerified }) => {
   const [otp, setOtp] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const sendOtp = async () => {
+    try {
+      await axios.post(`${API_URL}/api/auth/send-otp`, { email });
+      toast.success("OTP sent! Check your email.");
+    } catch (err) {
+      const msg = err.response?.data?.msg || err.message;
+      toast.error(msg);
+    }
+  };
+
   const handleVerify = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
-      const { data } = await axios.post(`${API_URL}/api/user/verify-otp`, { email, otp });
+      const { data } = await axios.post(`${API_URL}/api/auth/verify-otp`, { email, otp });
       localStorage.setItem("token", data.token);
       toast.success("OTP verified! Redirecting...");
       onVerified?.();
@@ -34,6 +42,14 @@ const OtpVerification = ({ email, onVerified }) => {
       <p className="text-center text-gray-500 mb-4">
         Enter the OTP sent to <strong>{email}</strong>
       </p>
+
+      <button
+        type="button"
+        onClick={sendOtp}
+        className="w-full bg-purple-500 hover:bg-purple-600 text-white py-2 px-4 rounded-lg mb-4"
+      >
+        Send OTP
+      </button>
 
       <form onSubmit={handleVerify} className="space-y-4">
         <input
