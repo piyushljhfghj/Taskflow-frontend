@@ -3,8 +3,8 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { PlusCircle, X, Save, Calendar, AlignLeft, Flag, CheckCircle } from 'lucide-react';
 import { baseControlClasses, priorityStyles, DEFAULT_TASK } from '../assets/dummy';
 
-// const API_BASE = 'http://localhost:4000/api/tasks';
-const API_BASE = "https://server-tflow.onrender.com/api/tasks"
+const API_BASE = 'http://localhost:4000/api/tasks/gp';
+// const API_BASE = "https://server-tflow.onrender.com/api/tasks"
 
 
 const TaskModal = ({ isOpen, onClose, taskToEdit, onSave, onLogout }) => {
@@ -13,7 +13,7 @@ const TaskModal = ({ isOpen, onClose, taskToEdit, onSave, onLogout }) => {
   const [error, setError] = useState(null);
   const today = new Date().toISOString().split('T')[0];
 
-  useEffect(() => {
+  useEffect(() => { 
     if (!isOpen) return;
     if (taskToEdit) {
       const normalized = taskToEdit.completed === 'Yes' || taskToEdit.completed === true ? 'Yes' : 'No';
@@ -157,3 +157,115 @@ const TaskModal = ({ isOpen, onClose, taskToEdit, onSave, onLogout }) => {
 };
 
 export default TaskModal;
+
+
+
+
+// // ✅ Full working TaskModal.jsx (Add + Edit Task)
+// import { useState, useEffect } from "react";
+// import axios from "axios";
+// import { Button } from "@/components/ui/button";
+
+// const TaskModal = ({ onClose, onSave, userId, editTask }) => {
+//   const [title, setTitle] = useState("");
+//   const [description, setDescription] = useState("");
+//   const [priority, setPriority] = useState("low");
+//   const [status, setStatus] = useState("pending");
+
+//   // ✅ When editing, prefill data
+//   useEffect(() => {
+//     if (editTask) {
+//       setTitle(editTask.title);
+//       setDescription(editTask.description);
+//       setPriority(editTask.priority);
+//       setStatus(editTask.status);
+//     }
+//   }, [editTask]);
+
+//   // ✅ Save new or updated task
+//   const handleSave = async () => {
+//     if (!title.trim()) return alert("Please enter task title");
+
+//     const taskData = {
+//       title,
+//       description,
+//       priority,
+//       status,
+//       userId, // ✅ assign to selected user
+//     };
+
+//     try {
+//       if (editTask) {
+//         // ✅ Update task
+//         await axios.put(`/tasks/${editTask._id}`, taskData);
+//       } else {
+//         // ✅ Add new task
+//         await axios.post("/tasks", taskData);
+//       }
+//       onSave();
+//     } catch (err) {
+//       console.error("Error saving task:", err);
+//       alert("Failed to save task");
+//     }
+//   };
+
+//   return (
+//     <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50">
+//       <div className="bg-white rounded-2xl shadow-lg p-6 w-[400px]">
+//         <h2 className="text-xl font-semibold mb-4">
+//           {editTask ? "Edit Task" : "Add Task"}
+//         </h2>
+
+//         <input
+//           className="border rounded-md w-full p-2 mb-3"
+//           placeholder="Task Title"
+//           value={title}
+//           onChange={(e) => setTitle(e.target.value)}
+//         />
+//         <textarea
+//           className="border rounded-md w-full p-2 mb-3"
+//           placeholder="Task Description"
+//           value={description}
+//           onChange={(e) => setDescription(e.target.value)}
+//         />
+//         <div className="flex gap-2 mb-3">
+//           <select
+//             className="border rounded-md p-2 w-1/2"
+//             value={priority}
+//             onChange={(e) => setPriority(e.target.value)}
+//           >
+//             <option value="low">Low</option>
+//             <option value="medium">Medium</option>
+//             <option value="high">High</option>
+//           </select>
+//           <select
+//             className="border rounded-md p-2 w-1/2"
+//             value={status}
+//             onChange={(e) => setStatus(e.target.value)}
+//           >
+//             <option value="pending">Pending</option>
+//             <option value="in-progress">In Progress</option>
+//             <option value="completed">Completed</option>
+//           </select>
+//         </div>
+
+//         <div className="flex justify-end gap-2">
+//           <Button
+//             className="bg-gray-300 hover:bg-gray-400 text-black"
+//             onClick={onClose}
+//           >
+//             Cancel
+//           </Button>
+//           <Button
+//             className="bg-green-600 hover:bg-green-700 text-white"
+//             onClick={handleSave}
+//           >
+//             {editTask ? "Update" : "Add"}
+//           </Button>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default TaskModal;

@@ -13,7 +13,7 @@ const Layout = ({ user, onLogout }) => {
     setLoading(true);
     setError(null);
     try {
-      const { data } = await API.get("/api/tasks/gp"); // ✅ token auto-attached
+      const { data } = await API.get("tasks/gp"); // ✅ token auto-attached
 
       const arr = Array.isArray(data)
         ? data
@@ -71,3 +71,9 @@ const Layout = ({ user, onLogout }) => {
 };
 
 export default Layout;
+
+// till signup and login feature
+
+
+
+// ---------------------------------------------------------------------------

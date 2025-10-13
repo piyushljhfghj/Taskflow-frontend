@@ -7,10 +7,10 @@ const Navbar = ({ onLogout, user = {}}) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
 
-useEffect(() => {
+useEffect(() => {    
   const handleClickOutside = (event) => {
     if (menuRef.current && !menuRef.current.contains(event.target)) {
-      setMenuOpen(false)
+      setMenuOpen(false)    
     }
   }
   document.addEventListener("mousedown", handleClickOutside)

@@ -158,3 +158,7 @@ export default function Profile({ setCurrentUser, onLogout }) {
     </div>
   )
 }
+
+// // till sign up and login
+
+// // ----------------------------------------------------------------------
