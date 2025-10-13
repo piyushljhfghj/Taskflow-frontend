@@ -80,7 +80,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:4000";
+const API_URL = import.meta.env.VITE_API_URL || "https://taskflow-frontend-nine.vercel.app";
 
 const OtpVerification = ({ email, onVerified }) => {
   const [otp, setOtp] = useState("");

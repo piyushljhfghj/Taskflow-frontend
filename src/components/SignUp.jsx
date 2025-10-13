@@ -377,7 +377,7 @@ import { signInWithPopup } from "firebase/auth";
 import { auth, googleProvider } from "../firebase";
 import { Inputwrapper } from "../assets/dummy";
 
-const API_URL = "http://localhost:4000"; // backend
+const API_URL = "https://taskflow-frontend-nine.vercel.app"; // backend
 
 const INITIAL_FORM = { name: "", email: "", password: "" };
 
