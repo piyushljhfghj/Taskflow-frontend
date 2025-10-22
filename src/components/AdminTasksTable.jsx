@@ -98,10 +98,6 @@
 // ----------------------------------------------------
 
 
-
-
-
-
 import { Edit2, Trash2 } from "lucide-react";
 
 const AdminTasksTable = ({ tasks, onEdit, onDelete, onAdd, showDueDate = false }) => {
@@ -127,11 +123,14 @@ const AdminTasksTable = ({ tasks, onEdit, onDelete, onAdd, showDueDate = false }
                 <th className="py-2 px-4">Title</th>
                 <th className="py-2 px-4">Priority</th>
                 <th className="py-2 px-4">Status</th>
-                {/* ✅ Added Due Date column */}
+                {/* ✅ Added Assign Date column */}
+                {showDueDate && <th className="py-2 px-4">Assign Date</th>}
+                {/* ✅ Existing Due Date column */}
                 {showDueDate && <th className="py-2 px-4">Due Date</th>}
                 <th className="py-2 px-4 text-right">Actions</th>
               </tr>
             </thead>
+
             <tbody>
               {tasks.map((task) => (
                 <tr
@@ -139,6 +138,7 @@ const AdminTasksTable = ({ tasks, onEdit, onDelete, onAdd, showDueDate = false }
                   className="border-b hover:bg-purple-50 transition"
                 >
                   <td className="py-2 px-4 font-medium">{task.title}</td>
+
                   <td className="py-2 px-4">
                     <span
                       className={`px-2 py-1 text-xs rounded-full ${
@@ -152,6 +152,7 @@ const AdminTasksTable = ({ tasks, onEdit, onDelete, onAdd, showDueDate = false }
                       {task.priority}
                     </span>
                   </td>
+
                   <td className="py-2 px-4">
                     {task.completed ? (
                       <span className="text-green-600 font-medium">Completed</span>
@@ -160,7 +161,16 @@ const AdminTasksTable = ({ tasks, onEdit, onDelete, onAdd, showDueDate = false }
                     )}
                   </td>
 
-                  {/* ✅ Added Due Date cell */}
+                  {/* ✅ Assign Date cell */}
+                  {showDueDate && (
+                    <td className="py-2 px-4 text-gray-700">
+                      {task.createdAt
+                        ? new Date(task.createdAt).toLocaleDateString()
+                        : "N/A"}
+                    </td>
+                  )}
+
+                  {/* ✅ Due Date cell */}
                   {showDueDate && (
                     <td className="py-2 px-4 text-gray-700">
                       {task.dueDate
