@@ -1,44 +1,33 @@
+
+
+
 // import { useState, useEffect } from "react"
-// import axios from "axios"
 // import { format, isToday } from "date-fns"
-// import TaskModal from "./TaskModal";
-// import { getPriorityColor, getPriorityBadgeColor, TI_CLASSES, MENU_OPTIONS, } from "../assets/dummy"
+// import TaskModal from "./TaskModal"
+// import { getPriorityColor, getPriorityBadgeColor, TI_CLASSES, MENU_OPTIONS } from "../assets/dummy"
 // import { CheckCircle2, MoreVertical, Clock, Calendar } from "lucide-react"
-// import API from "../api";
+// import API from "../api"
 
 // const TaskItem = ({ task, onRefresh, onLogout, showCompleteCheckbox = true }) => {
 //   const [showMenu, setShowMenu] = useState(false)
-//   const [isCompleted, setIsCompleted] = useState(
-//     [true, 1, "yes"].includes(
-//       typeof task.completed === 'string' ? task.completed.toLowerCase() : task.completed
-//     )
-//   )
+//   const [isCompleted, setIsCompleted] = useState(!!task.completed)
 //   const [showEditModal, setShowEditModal] = useState(false)
 //   const [subtasks, setSubtasks] = useState(task.subtasks || [])
 
 //   useEffect(() => {
-//     setIsCompleted(
-//       [true, 1, "yes"].includes(
-//         typeof task.completed === 'string' ? task.completed.toLowerCase() : task.completed
-//       )
-//     )
+//     setIsCompleted(!!task.completed)
 //   }, [task.completed])
-
-//   const getAuthHeaders = () => {
-//     const token = localStorage.getItem("token")
-//     if (!token) throw new Error("No auth token found")
-//     return { Authorization: `Bearer ${token}` }
-//   }
 
 //   const borderColor = isCompleted
 //     ? "border-green-500"
 //     : getPriorityColor(task.priority).split(" ")[0]
 
+//   // ✅ Toggle complete
 //   const handleComplete = async () => {
-//     const newStatus = isCompleted ? "No" : "Yes"
 //     try {
-//       await axios.put(`${API_BASE}/${task._id}/gp`, { completed: newStatus }, { headers: getAuthHeaders() })
-//       setIsCompleted(!isCompleted)
+//       const updatedStatus = !isCompleted
+//       await API.put(`/tasks/${task._id}`, { completed: updatedStatus })
+//       setIsCompleted(updatedStatus)
 //       onRefresh?.()
 //     } catch (err) {
 //       console.error(err)
@@ -46,15 +35,10 @@
 //     }
 //   }
 
-//   const handleAction = (action) => {
-//     setShowMenu(false)
-//     if (action === 'edit') setShowEditModal(true)
-//     if (action === 'delete') handleDelete()
-//   }
-
+//   // ✅ Delete task
 //   const handleDelete = async () => {
 //     try {
-//       await axios.delete(`${API_BASE}/${task._id}/gp`, { headers: getAuthHeaders() })
+//       await API.delete(`/tasks/${task._id}`)
 //       onRefresh?.()
 //     } catch (err) {
 //       console.error(err)
@@ -62,11 +46,12 @@
 //     }
 //   }
 
+//   // ✅ Save edits
 //   const handleSave = async (updatedTask) => {
 //     try {
-//       const payload = (({ title, description, priority, dueDate, completed }) =>
-//         ({ title, description, priority, dueDate, completed }))(updatedTask)
-//       await axios.put(`${API_BASE}/${task._id}/gp`, payload, { headers: getAuthHeaders() })
+//       const payload = (({ title, description, priority, dueDate, completed, subtasks }) =>
+//         ({ title, description, priority, dueDate, completed, subtasks }))(updatedTask)
+//       await API.put(`/tasks/${task._id}`, payload)
 //       setShowEditModal(false)
 //       onRefresh?.()
 //     } catch (err) {
@@ -75,13 +60,32 @@
 //     }
 //   }
 
+//   // ✅ Handle menu actions
+//   const handleAction = (action) => {
+//     switch (action) {
+//       case "edit":
+//         setShowEditModal(true)
+//         break
+//       case "delete":
+//         handleDelete()
+//         break
+//       case "complete":
+//         handleComplete()
+//         break
+//       default:
+//         console.warn("Unknown action:", action)
+//     }
+//     setShowMenu(false)
+//   }
+
+//   // Progress calculation
 //   const progress = subtasks.length
 //     ? (subtasks.filter(st => st.completed).length / subtasks.length) * 100
 //     : 0
 
 //   return (
 //     <>
-//       <div className={`${TI_CLASSES.wrapper} ${borderColor}`}>        
+//       <div className={`${TI_CLASSES.wrapper} ${borderColor}`}>
 //         <div className={TI_CLASSES.leftContainer}>
 //           {showCompleteCheckbox && (
 //             <button
@@ -103,6 +107,8 @@
 //               <span className={`${TI_CLASSES.priorityBadge} ${getPriorityBadgeColor(task.priority)}`}>{task.priority}</span>
 //             </div>
 //             {task.description && <p className={TI_CLASSES.description}>{task.description}</p>}
+
+//             {/* ✅ Subtasks */}
 //             {subtasks.length > 0 && (
 //               <div className={TI_CLASSES.subtasksContainer}>
 //                 <div className="flex items-center justify-between text-xs text-gray-500 font-medium">
@@ -117,10 +123,23 @@
 //                       <input
 //                         type="checkbox"
 //                         checked={st.completed}
-//                         onChange={() => setSubtasks(prev => prev.map((s, idx) => idx === i ? {...s, completed: !s.completed} : s))}
+//                         onChange={async () => {
+//                           const updated = subtasks.map((s, idx) =>
+//                             idx === i ? { ...s, completed: !s.completed } : s
+//                           )
+//                           setSubtasks(updated)
+//                           try {
+//                             await API.put(`/tasks/${task._id}`, { subtasks: updated })
+//                             onRefresh?.()
+//                           } catch (err) {
+//                             console.error(err)
+//                           }
+//                         }}
 //                         className="w-4 h-4 text-purple-500 rounded border-gray-300 focus:ring-purple-500"
 //                       />
-//                       <span className={`text-sm truncate ${st.completed ? 'text-gray-400 line-through' : 'text-gray-600 group-hover/subtask:text-purple-700'} transition-colors duration-200`}>{st.title}</span>
+//                       <span className={`text-sm truncate ${st.completed ? 'text-gray-400 line-through' : 'text-gray-600 group-hover/subtask:text-purple-700'} transition-colors duration-200`}>
+//                         {st.title}
+//                       </span>
 //                     </div>
 //                   ))}
 //                 </div>
@@ -131,7 +150,7 @@
 
 //         <div className={TI_CLASSES.rightContainer}>
 //           <div className="relative">
-//             <button onClick={()=>setShowMenu(!showMenu)} className={TI_CLASSES.menuButton}>
+//             <button onClick={() => setShowMenu(!showMenu)} className={TI_CLASSES.menuButton}>
 //               <MoreVertical size={16} className="w-4 h-4 sm:w-5 sm:h-5" />
 //             </button>
 //             {showMenu && (
@@ -139,7 +158,7 @@
 //                 {MENU_OPTIONS.map(opt => (
 //                   <button
 //                     key={opt.action}
-//                     onClick={()=>handleAction(opt.action)}
+//                     onClick={() => handleAction(opt.action)}
 //                     className="w-full px-3 sm:px-4 py-2 text-left text-xs sm:text-sm hover:bg-purple-50 flex items-center gap-2 transition-colors duration-200"
 //                   >
 //                     {opt.icon}{opt.label}
@@ -150,7 +169,7 @@
 //           </div>
 
 //           <div>
-//             <div className={`${TI_CLASSES.dateRow} ${task.dueDate && isToday(new Date(task.dueDate)) ? 'text-fuchsia-600' : 'text-gray-500'}`}>              
+//             <div className={`${TI_CLASSES.dateRow} ${task.dueDate && isToday(new Date(task.dueDate)) ? 'text-fuchsia-600' : 'text-gray-500'}`}>
 //               <Calendar className="w-3.5 h-3.5" />
 //               {task.dueDate ? (isToday(new Date(task.dueDate)) ? 'Today' : format(new Date(task.dueDate), 'MMM dd')) : '—'}
 //             </div>
@@ -164,7 +183,7 @@
 
 //       <TaskModal
 //         isOpen={showEditModal}
-//         onClose={()=>setShowEditModal(false)}
+//         onClose={() => setShowEditModal(false)}
 //         taskToEdit={task}
 //         onSave={handleSave}
 //       />
@@ -172,7 +191,18 @@
 //   )
 // }
 
-// export default TaskItem;
+// export default TaskItem
+
+
+
+
+// ---------------------------------------------------
+
+
+
+
+
+
 
 import { useState, useEffect } from "react"
 import { format, isToday } from "date-fns"
@@ -199,7 +229,7 @@ const TaskItem = ({ task, onRefresh, onLogout, showCompleteCheckbox = true }) =>
   const handleComplete = async () => {
     try {
       const updatedStatus = !isCompleted
-      await API.put(`/api/tasks/${task._id}/gp`, { completed: updatedStatus })
+      await API.put(`/tasks/${task._id}`, { completed: updatedStatus })
       setIsCompleted(updatedStatus)
       onRefresh?.()
     } catch (err) {
@@ -211,7 +241,7 @@ const TaskItem = ({ task, onRefresh, onLogout, showCompleteCheckbox = true }) =>
   // ✅ Delete task
   const handleDelete = async () => {
     try {
-      await API.delete(`/api/tasks/${task._id}/gp`)
+      await API.delete(`/tasks/${task._id}`)
       onRefresh?.()
     } catch (err) {
       console.error(err)
@@ -224,7 +254,7 @@ const TaskItem = ({ task, onRefresh, onLogout, showCompleteCheckbox = true }) =>
     try {
       const payload = (({ title, description, priority, dueDate, completed, subtasks }) =>
         ({ title, description, priority, dueDate, completed, subtasks }))(updatedTask)
-      await API.put(`/api/tasks/${task._id}/gp`, payload)
+      await API.put(`/tasks/${task._id}`, payload)
       setShowEditModal(false)
       onRefresh?.()
     } catch (err) {
@@ -302,7 +332,7 @@ const TaskItem = ({ task, onRefresh, onLogout, showCompleteCheckbox = true }) =>
                           )
                           setSubtasks(updated)
                           try {
-                            await API.put(`/api/tasks/${task._id}/gp`, { subtasks: updated })
+                            await API.put(`/tasks/${task._id}`, { subtasks: updated })
                             onRefresh?.()
                           } catch (err) {
                             console.error(err)

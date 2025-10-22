@@ -676,7 +676,7 @@ const Login = ({ onSubmit, onOtpFlow }) => {
     try {
       const result = await signInWithPopup(auth, googleProvider);
       const firebaseToken = await result.user.getIdToken();
-      const { data } = await axios.post(`${API_URL}/api/auth/login/google`, { token: firebaseToken });
+      const { data } = await axios.post(`${API_URL}/auth/login/google`, { token: firebaseToken });
 
       onSubmit?.(data);
       localStorage.setItem("token", data.token);
@@ -789,6 +789,184 @@ export default Login;
 
 
 
+
+
+
+// ------------------------------------------------------------------
+
+
+
+
+
+
+
+// import React, { useState } from "react";
+// import { Mail, Lock, LogIn } from "lucide-react";
+// import { FcGoogle } from "react-icons/fc";
+// import { useNavigate } from "react-router-dom";
+// import axios from "axios";
+// import { auth, googleProvider } from "../firebase";
+// import { signInWithPopup } from "firebase/auth";
+
+// const API_URL = import.meta.env.VITE_API_URL || "http://localhost:4000";
+
+// const Login = ({ onSubmit, onOtpFlow }) => {
+//   const [formData, setFormData] = useState({ email: "", password: "" });
+//   const [loading, setLoading] = useState(false);
+//   const [message, setMessage] = useState({ text: "", type: "" });
+//   const navigate = useNavigate();
+
+//   // Gmail + Password login
+//   const handleLogin = async (e) => {
+//     e.preventDefault();
+//     setLoading(true);
+//     try {
+//       const { data } = await axios.post(`${API_URL}/api/auth/login`, formData);
+
+//       if (data.requiresOtp) {
+//         onOtpFlow(formData.email);
+//       } else {
+//         onSubmit?.(data);
+//         localStorage.setItem("token", data.token);
+
+//         // Redirect based on role
+//         const user = data.user;
+//         if (user?.role === "admin") {
+//           navigate("/admin/dashboard");
+//         } else {
+//           navigate("/dashboard");
+//         }
+
+//         setMessage({ text: "Login successful!", type: "success" });
+//       }
+//     } catch (err) {
+//       const status = err.response?.status;
+//       if (status === 404) {
+//         // User not found → redirect to signup
+//         setMessage({ text: "User not found. Please sign up first.", type: "error" });
+//         setTimeout(() => navigate("/signup"), 1500);
+//       } else if (status === 401) {
+//         // Wrong password
+//         setMessage({ text: "Wrong password. Try again.", type: "error" });
+//       } else {
+//         setMessage({ text: "Login failed. Try again.", type: "error" });
+//       }
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   // Google login
+//   const handleGoogleLogin = async () => {
+//     try {
+//       const result = await signInWithPopup(auth, googleProvider);
+//       const firebaseToken = await result.user.getIdToken();
+//       const { data } = await axios.post(`${API_URL}/auth/login/google`, { token: firebaseToken });
+
+//       onSubmit?.(data);
+//       localStorage.setItem("token", data.token);
+
+//       const user = data.user;
+//       if (user?.role === "admin") {
+//         navigate("/admin/dashboard");
+//       } else {
+//         navigate("/dashboard");
+//       }
+
+//       setMessage({ text: "Google login successful!", type: "success" });
+//     } catch (err) {
+//       const msg = err.response?.data?.msg || err.message;
+//       setMessage({ text: msg, type: "error" });
+//     }
+//   };
+
+//   return (
+//     <div className="max-w-md w-full bg-white p-8 rounded-xl shadow-lg border border-purple-100">
+//       <div className="mb-6 text-center">
+//         <div className="w-16 h-16 bg-gradient-to-br from-fuchsia-500 to-purple-600 rounded-full mx-auto flex items-center justify-center mb-4">
+//           <LogIn className="w-8 h-8 text-white" />
+//         </div>
+//         <h2 className="text-2xl font-bold text-gray-800">Welcome Back</h2>
+//         <p className="text-gray-500 text-sm mt-1">Sign in to continue</p>
+//       </div>
+
+//       {message.text && (
+//         <p className={`text-sm mb-4 ${message.type === "success" ? "text-green-600" : "text-red-600"}`}>
+//           {message.text}
+//         </p>
+//       )}
+
+//       <form onSubmit={handleLogin} className="space-y-4">
+//         <div className="flex items-center border rounded-lg px-3 py-2">
+//           <Mail className="text-purple-500 w-5 h-5 mr-2" />
+//           <input
+//             type="email"
+//             placeholder="Email"
+//             value={formData.email}
+//             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+//             className="w-full focus:outline-none text-sm text-gray-700"
+//             required
+//           />
+//         </div>
+
+//         <div className="flex items-center border rounded-lg px-3 py-2">
+//           <Lock className="text-purple-500 w-5 h-5 mr-2" />
+//           <input
+//             type="password"
+//             placeholder="Password"
+//             value={formData.password}
+//             onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+//             className="w-full focus:outline-none text-sm text-gray-700"
+//             required
+//           />
+//         </div>
+
+//         <div className="flex justify-between items-center text-sm">
+//           <button
+//             type="button"
+//             onClick={() => navigate("/forgot-password")}
+//             className="text-purple-600 hover:underline"
+//           >
+//             Forgot Password?
+//           </button>
+//         </div>
+
+//         <button
+//           type="submit"
+//           className="w-full bg-purple-600 text-white py-2 rounded-lg"
+//           disabled={loading}
+//         >
+//           {loading ? "Logging in..." : "Login"}
+//         </button>
+//       </form>
+
+//       <div className="mt-4">
+//         <button
+//           type="button"
+//           onClick={handleGoogleLogin}
+//           className="w-full border rounded-lg py-2 flex items-center justify-center gap-2 hover:bg-gray-100"
+//         >
+//           <FcGoogle className="w-5 h-5" />
+//           <span className="text-sm text-gray-700">Continue with Google</span>
+//         </button>
+//       </div>
+
+//       <p className="text-center text-sm text-gray-600 mt-6">
+//         Don't have an account?{" "}
+//         <button
+//           type="button"
+//           onClick={() => navigate("/signup")}
+//           className="text-purple-600 hover:underline"
+//         >
+//           Sign Up
+//         </button>
+//       </p>
+//     </div>
+//   );
+// };
+
+// export default Login;
+   
 
 
 
