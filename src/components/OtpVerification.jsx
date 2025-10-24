@@ -82,7 +82,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-const API_URL = import.meta.env.VITE_API_URL || "https://server-tflow.onrender.com/";
+const API_URL = import.meta.env.VITE_API_URL || "https://server-tflow.onrender.com";
 
 const OtpVerification = ({ email, onVerified }) => {
   const [otp, setOtp] = useState("");

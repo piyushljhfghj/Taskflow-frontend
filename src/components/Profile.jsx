@@ -175,7 +175,7 @@ import "react-toastify/dist/ReactToastify.css"
 import API from "../api";
 import { INPUT_WRAPPER, FULL_BUTTON, SECTION_WRAPPER, BACK_BUTTON, DANGER_BTN, personalFields, securityFields } from '../assets/dummy'
 
-const API_URL = import.meta.env.VITE_API_URL || "https://server-tflow.onrender.com/";
+const API_URL = import.meta.env.VITE_API_URL || "https://server-tflow.onrender.com";
 
 
 export default function Profile({ setCurrentUser, onLogout }) {
