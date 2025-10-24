@@ -623,7 +623,7 @@ import axios from "axios";
 import { auth, googleProvider } from "../firebase";
 import { signInWithPopup } from "firebase/auth";
 
-const API_URL = import.meta.env.VITE_API_URL || "https://server-tflow.onrender.com";
+const API_URL = import.meta.env.VITE_API_URL || "https://server-tflow.onrender.com/";
 
 const Login = ({ onSubmit, onOtpFlow }) => {
   const [formData, setFormData] = useState({ email: "", password: "" });
@@ -636,7 +636,7 @@ const Login = ({ onSubmit, onOtpFlow }) => {
     e.preventDefault();
     setLoading(true);
     try {
-      const { data } = await axios.post(`${API_URL}/api/auth/login`, formData);
+      const { data } = await axios.post(`${API_URL}/auth/login`, formData);
 
       if (data.requiresOtp) {
         onOtpFlow(formData.email);

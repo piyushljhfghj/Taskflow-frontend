@@ -172,7 +172,7 @@ import { signInWithPopup } from "firebase/auth";
 import { auth, googleProvider } from "../firebase";
 import { Inputwrapper } from "../assets/dummy";
 
-const API_URL = "https://server-tflow.onrender.com"; // backend
+const API_URL = "https://server-tflow.onrender.com/"; // backend
 
 const INITIAL_FORM = { name: "", email: "", password: "" };
 
