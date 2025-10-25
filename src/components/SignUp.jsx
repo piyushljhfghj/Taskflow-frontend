@@ -190,7 +190,7 @@ const SignUp = ({ onSwitchMode, onSubmit }) => {
     e.preventDefault();
     setLoading(true);
     try {
-      const { data } = await axios.post(`${API_URL}/auth/signup/send-otp`, formData);
+      const { data } = await axios.post(`${API_URL}/api/auth/signup/send-otp`, formData);
       setOtpSent(true);
       setMessage({ text: data.msg, type: "success" });
     } catch (err) {
@@ -208,7 +208,7 @@ const SignUp = ({ onSwitchMode, onSubmit }) => {
     e.preventDefault();
     setLoading(true);
     try {
-      const { data } = await axios.post(`${API_URL}/auth/signup/verify-otp`, { email: formData.email, otp });
+      const { data } = await axios.post(`${API_URL}/api/auth/signup/verify-otp`, { email: formData.email, otp });
       localStorage.setItem("token", data.token);
       localStorage.setItem("userId", data.user._id);
       onSubmit?.(data);
@@ -232,7 +232,7 @@ const SignUp = ({ onSwitchMode, onSubmit }) => {
       const user = result.user;
       const firebaseToken = await user.getIdToken();
 
-      const { data } = await axios.post(`${API_URL}/auth/google`, { token: firebaseToken });
+      const { data } = await axios.post(`${API_URL}/api/auth/google`, { token: firebaseToken });
       localStorage.setItem("token", data.token);
       localStorage.setItem("userId", data.user._id);
       onSubmit?.(data);
